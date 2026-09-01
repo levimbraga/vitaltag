@@ -16,19 +16,23 @@ arquitetura em camadas, tipagem forte e validação de dados em uma aplicação 
 
 ## Funcionalidades
 
-- Cadastro e autenticação de usuários com sessão persistente
-- Criação e edição da ficha clínica pessoal
-- Registro de tipo sanguíneo, sexo, data de nascimento e observações gerais
-- Cadastro de múltiplos contatos de emergência com telefone e grau de parentesco
-- Registro de itens clínicos por categoria (alergias, condições, medicamentos,
-  cirurgias e outros registros relevantes)
-- Geração de QR Code vinculado à ficha do usuário
-- Página pública de emergência protegida por senha de acesso
-- Definição e troca da senha de acesso público pelo titular da ficha
-- Ativação e desativação do acesso público a qualquer momento
-- Registro das consultas realizadas à ficha, com data e hora
-- Validação de todos os dados de entrada no cliente e no servidor
-- Interface responsiva, pensada primeiro para uso em celular
+- Cadastro de usuário com e-mail e senha
+- Login e logout, com sessão expirando após 30 minutos de inatividade
+- Recuperação de senha por link temporário enviado ao e-mail
+- Cadastro da ficha clínica com nome, sobrenome, sexo, tipo sanguíneo
+  e contato de emergência
+- Registro de alergias, medicamentos em uso, doenças e cirurgias
+  realizadas
+- Edição da ficha sem alterar o link público já impresso
+- Exclusão definitiva da ficha, tornando o link público indisponível
+- Definição de senha de acesso público, distinta da senha de conta
+- Geração de QR Code apontando para a URL pública única da ficha
+- Cartão em PDF para impressão, com o QR Code e a senha em campo
+  separado
+- Página pública de emergência liberada somente após a senha de acesso
+- Bloqueio temporário do acesso público após 5 tentativas incorretas
+- Histórico das consultas realizadas à ficha, com data, hora e
+  resultado
 
 ## Tecnologias
 
