@@ -89,7 +89,7 @@ O fluxo típico de uma requisição é: `app` → `application` → `domain`, co
 vitaltag/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml              # lint e testes em push e pull request
+│       └── ci.yml              # lint e testes, execução manual até a Sprint 2
 ├── prisma/
 │   └── schema.prisma           # modelo de dados e enums
 ├── src/
@@ -98,6 +98,7 @@ vitaltag/
 │   ├── domain/                 # entidades, tipos e interfaces de repositório
 │   └── infrastructure/         # Prisma, autenticação e serviços externos
 ├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
