@@ -73,7 +73,6 @@ model FichaClinica {
   registrosClinicos  RegistroClinico[]
   acessosPublicos    AcessoPublico[]
 
-  @@index([slugPublico])
   @@map("ficha_clinica")
 }
 

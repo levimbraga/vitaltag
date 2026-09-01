@@ -3,7 +3,7 @@
 O VitalTag é um sistema web para cadastro e consulta de informações clínicas de
 emergência. A ideia central do projeto é permitir que qualquer pessoa registre os
 dados de saúde que precisam ser conhecidos rapidamente em uma situação crítica —
-tipo sanguíneo, alergias, condições preexistentes, medicamentos em uso e contatos
+tipo sanguíneo, alergias, doenças, medicamentos em uso e contatos
 de emergência — e que esses dados possam ser acessados por meio de um QR Code.
 
 O QR Code aponta para uma página pública de leitura, mas o conteúdo da ficha só é
