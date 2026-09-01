@@ -1,0 +1,122 @@
+// Modelo de dados do VitalTag
+// Tabelas e colunas em snake_case; modelos em PascalCase no client.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum sexo {
+  FEMININO
+  MASCULINO
+  OUTRO
+  NAO_INFORMADO
+
+  @@map("sexo")
+}
+
+enum tipo_sanguineo {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+
+  @@map("tipo_sanguineo")
+}
+
+enum tipo_registro {
+  ALERGIA
+  MEDICAMENTO
+  DOENCA
+  CIRURGIA
+
+  @@map("tipo_registro")
+}
+
+model Usuario {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome            String   @db.VarChar(120)
+  email           String   @unique @db.VarChar(180)
+  senhaHash       String   @map("senha_hash") @db.VarChar(255)
+  emailVerificado Boolean  @default(false) @map("email_verificado")
+  criadoEm        DateTime @default(now()) @map("criado_em") @db.Timestamptz(6)
+  atualizadoEm    DateTime @updatedAt @map("atualizado_em") @db.Timestamptz(6)
+
+  fichaClinica FichaClinica?
+
+  @@map("usuario")
+}
+
+model FichaClinica {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId         String         @unique @map("usuario_id") @db.Uuid
+  slugPublico       String         @unique @default(dbgenerated("gen_random_uuid()")) @map("slug_publico") @db.Uuid
+  nome              String         @db.VarChar(80)
+  sobrenome         String         @db.VarChar(120)
+  sexo              sexo
+  tipoSanguineo     tipo_sanguineo @map("tipo_sanguineo")
+  senhaPublicaHash  String         @map("senha_publica_hash") @db.VarChar(255)
+  ativa             Boolean        @default(true)
+  criadaEm          DateTime       @default(now()) @map("criada_em") @db.Timestamptz(6)
+  atualizadaEm      DateTime       @updatedAt @map("atualizada_em") @db.Timestamptz(6)
+
+  usuario            Usuario             @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  contatosEmergencia ContatoEmergencia[]
+  registrosClinicos  RegistroClinico[]
+  acessosPublicos    AcessoPublico[]
+
+  @@index([slugPublico])
+  @@map("ficha_clinica")
+}
+
+model ContatoEmergencia {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fichaId    String @map("ficha_id") @db.Uuid
+  nome       String @db.VarChar(120)
+  telefone   String @db.VarChar(20)
+  parentesco String @db.VarChar(60)
+  prioridade Int    @default(1) @db.SmallInt
+
+  ficha FichaClinica @relation(fields: [fichaId], references: [id], onDelete: Cascade)
+
+  @@index([fichaId])
+  @@map("contato_emergencia")
+}
+
+// Unifica alergias, medicamentos, doencas e cirurgias, distinguidas pela coluna tipo.
+model RegistroClinico {
+  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fichaId    String        @map("ficha_id") @db.Uuid
+  tipo       tipo_registro
+  descricao  String        @db.VarChar(200)
+  observacao String?       @db.Text
+  criadoEm   DateTime      @default(now()) @map("criado_em") @db.Timestamptz(6)
+
+  ficha FichaClinica @relation(fields: [fichaId], references: [id], onDelete: Cascade)
+
+  @@index([fichaId, tipo])
+  @@map("registro_clinico")
+}
+
+// Guarda cada tentativa de abrir a ficha publica; retencao prevista de 90 dias.
+model AcessoPublico {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fichaId    String   @map("ficha_id") @db.Uuid
+  ipOrigem   String   @map("ip_origem") @db.Inet
+  userAgent  String?  @map("user_agent") @db.VarChar(255)
+  sucesso    Boolean
+  ocorridoEm DateTime @default(now()) @map("ocorrido_em") @db.Timestamptz(6)
+
+  ficha FichaClinica @relation(fields: [fichaId], references: [id], onDelete: Cascade)
+
+  @@index([fichaId, ocorridoEm])
+  @@map("acesso_publico")
+}

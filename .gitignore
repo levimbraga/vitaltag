@@ -1,0 +1,50 @@
+# Dependências
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testes
+/coverage
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+
+# Build
+/build
+/dist
+
+# Produção
+*.tsbuildinfo
+
+# Variáveis de ambiente
+.env
+.env*.local
+.env.production
+
+# Prisma
+/prisma/*.db
+/prisma/*.db-journal
+
+# Vercel
+.vercel
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Editores e sistema operacional
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Cache de ferramentas
+.eslintcache
+.turbo
