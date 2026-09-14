@@ -1,10 +1,9 @@
-# A execução automática está desativada porque o repositório ainda não tem
-# package.json. Reativo os gatilhos de push e pull request quando eu
-# inicializar o projeto Next.js, na Sprint 2.
-
 name: CI
 
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -19,7 +18,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Instalar dependências
