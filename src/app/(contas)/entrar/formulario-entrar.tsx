@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { Aviso } from "@/components/aviso";
-import { BotaoEnviar, CLASSE_BOTAO_GRANDE } from "@/components/formulario/botao-enviar";
+import { CLASSE_LINK_CONTORNO, CLASSE_LINK_TEXTO } from "@/components/estilos";
+import { BotaoEnviar } from "@/components/formulario/botao-enviar";
 import { Campo } from "@/components/formulario/campo";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { entrar } from "../acoes";
 
 function caminhoInterno(url: string | undefined): string {
@@ -48,23 +47,13 @@ export function FormularioEntrar({
       />
       <Campo id="senha" rotulo="Senha" type="password" autoComplete="current-password" required />
 
-      <Link
-        href="/recuperar-senha"
-        className="self-start text-sm font-medium text-primary underline-offset-4 hover:underline"
-      >
+      <Link href="/recuperar-senha" className={CLASSE_LINK_TEXTO}>
         Esqueci minha senha
       </Link>
 
       <div className="mt-2 flex flex-col gap-[18px]">
         <BotaoEnviar textoPendente="Entrando…">Entrar</BotaoEnviar>
-        <Link
-          href="/cadastro"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            CLASSE_BOTAO_GRANDE,
-            "border-primary/20 bg-card text-primary hover:bg-secondary",
-          )}
-        >
+        <Link href="/cadastro" className={CLASSE_LINK_CONTORNO}>
           Criar uma conta
         </Link>
       </div>

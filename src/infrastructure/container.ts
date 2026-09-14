@@ -10,6 +10,7 @@ import { AtualizarFichaClinica } from "@/application/ficha/atualizar-ficha-clini
 import { CadastrarFichaClinica } from "@/application/ficha/cadastrar-ficha-clinica";
 import { DefinirSenhaPublica } from "@/application/ficha/definir-senha-publica";
 import { ExcluirFichaClinica } from "@/application/ficha/excluir-ficha-clinica";
+import { GerarQrCodeDaFicha } from "@/application/ficha/gerar-qr-code-da-ficha";
 import { ObterDadosCartao } from "@/application/ficha/obter-dados-cartao";
 import { ObterFichaDoTitular } from "@/application/ficha/obter-ficha-do-titular";
 import { ambiente } from "./config/ambiente";
@@ -18,6 +19,7 @@ import { prisma } from "./prisma/cliente";
 import { PrismaAcessoPublicoRepositorio } from "./prisma/repositorios/prisma-acesso-publico-repositorio";
 import { PrismaFichaClinicaRepositorio } from "./prisma/repositorios/prisma-ficha-clinica-repositorio";
 import { PrismaUsuarioRepositorio } from "./prisma/repositorios/prisma-usuario-repositorio";
+import { QrCodeGerador } from "./qrcode/qrcode-gerador";
 import { RelogioDoSistema } from "./relogio-do-sistema";
 import { Argon2ServicoHash } from "./seguranca/argon2-servico-hash";
 import { HmacImpressaoSenha, HmacTokenRedefinicao } from "./seguranca/hmac";
@@ -34,6 +36,7 @@ function montar() {
   const tokens = new HmacTokenRedefinicao(env.AUTH_SECRET);
   const email = criarServicoEmail(env);
   const relogio = new RelogioDoSistema();
+  const qrCode = new QrCodeGerador();
 
   return {
     urlBase: env.APP_URL,
@@ -57,6 +60,7 @@ function montar() {
     excluirFichaClinica: new ExcluirFichaClinica(fichas),
     definirSenhaPublica: new DefinirSenhaPublica(fichas, usuarios, hash),
     obterDadosCartao: new ObterDadosCartao(fichas, hash, env.APP_URL),
+    gerarQrCodeDaFicha: new GerarQrCodeDaFicha(fichas, qrCode, env.APP_URL),
 
     consultarSituacaoFichaPublica: new ConsultarSituacaoFichaPublica(fichas, acessos, relogio),
     acessarFichaPublica: new AcessarFichaPublica(fichas, acessos, hash, email, relogio),

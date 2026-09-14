@@ -1,10 +1,9 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
+import { CLASSE_BOTAO_GRANDE } from "@/components/estilos";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-export const CLASSE_BOTAO_GRANDE = "h-[54px] w-full rounded-xl text-base font-semibold";
 
 export function BotaoEnviar({
   children,

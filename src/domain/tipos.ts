@@ -34,6 +34,17 @@ export const ROTULO_TIPO_SANGUINEO: Record<TipoSanguineo, string> = {
   O_NEG: "O−",
 };
 
+export const DESCRICAO_TIPO_SANGUINEO: Record<TipoSanguineo, string> = {
+  A_POS: "A positivo",
+  A_NEG: "A negativo",
+  B_POS: "B positivo",
+  B_NEG: "B negativo",
+  AB_POS: "AB positivo",
+  AB_NEG: "AB negativo",
+  O_POS: "O positivo",
+  O_NEG: "O negativo",
+};
+
 export const ROTULO_TIPO_REGISTRO: Record<TipoRegistro, string> = {
   ALERGIA: "Alergias",
   MEDICAMENTO: "Medicamentos em uso",

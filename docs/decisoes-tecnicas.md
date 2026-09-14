@@ -19,3 +19,4 @@ resolvi as regras abaixo apenas com o que as tabelas existentes já oferecem.
 - **Prisma fixado na versão 6.19:** a partir da versão 7 o `directUrl` deixa de existir no datasource, e o schema entregue depende dessa sintaxe.
 - **Node 22 no CI:** o Vitest 5, que uso nos testes, exige Node 22 ou superior.
 - **shadcn/ui com Base UI:** o estilo padrão atual do shadcn/ui usa Base UI e o pacote `cn` no lugar do Radix, e mantive o padrão da ferramenta.
+- **Envio de e-mail pelo Resend:** a implementação está pronta, mas não foi testada por falta de chave de API; a demonstração usa a implementação de console, que exibe as mensagens no terminal do servidor.

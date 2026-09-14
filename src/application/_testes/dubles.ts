@@ -17,6 +17,7 @@ import type {
 } from "@/domain/repositorios/acesso-publico-repositorio";
 import type { FichaClinicaRepositorio } from "@/domain/repositorios/ficha-clinica-repositorio";
 import type { UsuarioRepositorio } from "@/domain/repositorios/usuario-repositorio";
+import type { GeradorQrCode } from "@/domain/servicos/gerador-qr-code";
 import type { Relogio } from "@/domain/servicos/relogio";
 import type { MensagemEmail, ServicoEmail } from "@/domain/servicos/servico-email";
 import type { ServicoHash } from "@/domain/servicos/servico-hash";
@@ -71,6 +72,22 @@ export class TokenFalso implements ServicoTokenRedefinicao {
     } catch {
       return null;
     }
+  }
+}
+
+export class GeradorQrCodeFalso implements GeradorQrCode {
+  conteudos: string[] = [];
+  tamanhos: number[] = [];
+
+  async svg(conteudo: string): Promise<string> {
+    this.conteudos.push(conteudo);
+    return `<svg data-conteudo="${conteudo}"></svg>`;
+  }
+
+  async png(conteudo: string, tamanhoPx: number): Promise<Uint8Array> {
+    this.conteudos.push(conteudo);
+    this.tamanhos.push(tamanhoPx);
+    return new Uint8Array();
   }
 }
 

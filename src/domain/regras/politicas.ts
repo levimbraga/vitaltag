@@ -12,5 +12,7 @@ export const INATIVIDADE_SESSAO_SEGUNDOS = 30 * 60;
 export const RETENCAO_ACESSOS_MS = 90 * 24 * 60 * MINUTO_MS;
 export const ACESSOS_POR_PAGINA = 20;
 
+export const TAMANHO_MINIMO_QR_PNG = 512;
+
 export const MAX_CONTATOS_EMERGENCIA = 3;
 export const MAX_ITENS_POR_REGISTRO = 30;
