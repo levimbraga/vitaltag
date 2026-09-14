@@ -26,6 +26,14 @@ export const cadastroUsuarioSchema = z.object({
   senha: senhaContaSchema,
 });
 
+// O formulário pede a senha duas vezes; o caso de uso recebe apenas a senha.
+export const cadastroUsuarioFormularioSchema = cadastroUsuarioSchema
+  .extend({ confirmacao: z.string() })
+  .refine((dados) => dados.senha === dados.confirmacao, {
+    error: "As senhas não conferem.",
+    path: ["confirmacao"],
+  });
+
 export const loginSchema = z.object({
   email: emailSchema,
   senha: z.string().min(1, "Informe a senha.").max(SENHA_CONTA_MAX),

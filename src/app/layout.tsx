@@ -22,8 +22,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+    // A variável da fonte fica no <html>, onde o Tailwind aplica font-sans.
+    <html lang="pt-BR" className={inter.variable}>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
