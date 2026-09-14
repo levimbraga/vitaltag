@@ -119,7 +119,7 @@ rolagem horizontal a 320px.
 
 ## Fase E — QR Code e acesso público
 
-Roteiro de navegador executado em 14/09/2026: 58 verificações, todas aprovadas na primeira execução.
+Roteiro de navegador executado em 14/09/2026: 56 verificações, todas aprovadas na primeira execução.
 
 Para os arquivos gerados, o roteiro usou `pdfinfo` e `pdftotext` (tamanho da página, texto e
 posição das palavras no PDF), `pdftoppm` (rasterização do cartão a 300 dpi) e o decodificador de
@@ -180,3 +180,23 @@ continuou bloqueado e a tentativa não foi gravada no histórico.
 
 Responsividade: as telas de QR Code, cartão, histórico, página pública de senha, ficha liberada e
 bloqueio não apresentaram rolagem horizontal a 320px.
+
+## Fase F — Acabamento e ensaio da demonstração
+
+Execuções de 14/09/2026, todas contra o build final de produção:
+
+| Verificação | Método | Resultado |
+| --- | --- | --- |
+| Ensaio do roteiro de demonstração, na mesma sequência de telas e com os mesmos valores usados na gravação, cobrindo as 13 user stories a partir da conta criada pelo seed. | Navegador | 24 verificações, todas aprovadas. |
+| Regressão dos roteiros das fases C, D e E. | Navegador | 25, 51 e 56 verificações, todas aprovadas. |
+| O seed cria a conta de demonstração com ficha completa e histórico. | Navegador | A conta ficou com 8 registros clínicos, 2 contatos e 24 acessos, e o login funcionou com as credenciais documentadas no README. |
+| Endereço inexistente mostra página de erro própria. | Navegador | Respondeu HTTP 404 com a página "Página não encontrada". |
+| Falhas inesperadas mostram tela de erro com opção de tentar novamente. | Inspeção | Há telas de erro na raiz, no painel e na página pública, e uma tela global para falhas no layout. Não provoquei uma falha real de banco para exibi-las. |
+| Estados de carregamento. | Navegador e inspeção | Os botões exibem o progresso durante o envio ("Entrando…", "Salvando…", "Gerando cartão…", "Verificando…"), conferido nos roteiros anteriores. Os links do painel mostram um indicador enquanto a próxima tela carrega. |
+| Responsividade a partir de 320px. | Navegador | Entrar, cadastro, recuperação, redefinição, página 404 e ficha indisponível sem rolagem horizontal a 320px. Somadas às fases anteriores, todas as telas foram verificadas nessa largura. |
+
+Testei também um esqueleto de carregamento para o painel e o removi: ele fazia a página chegar em
+partes, e o ensaio mostrou telas ainda sem conteúdo logo após a navegação e uma navegação que não
+terminou.
+
+Na primeira versão deste registro a Fase E constava com 58 verificações; o total correto é 56.

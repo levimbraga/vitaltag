@@ -5,6 +5,7 @@ import { ACESSOS_POR_PAGINA } from "@/domain/regras/politicas";
 import { exigirUsuario } from "@/app/_lib/sessao";
 import { Aviso } from "@/components/aviso";
 import { CLASSE_LINK_CONTORNO } from "@/components/estilos";
+import { TextoDoLink } from "@/components/texto-do-link";
 import { cn } from "@/lib/utils";
 import { casosDeUso } from "@/infrastructure/container";
 import { CabecalhoPagina } from "../_componentes/cabecalho-pagina";
@@ -80,12 +81,12 @@ export default async function PaginaHistorico({
         <nav aria-label="Paginação do histórico" className="flex gap-3">
           {pagina > 1 && (
             <Link href={`/painel/historico?pagina=${pagina - 1}`} className={CLASSE_LINK_CONTORNO}>
-              Anterior
+              <TextoDoLink>Anterior</TextoDoLink>
             </Link>
           )}
           {pagina < totalPaginas && (
             <Link href={`/painel/historico?pagina=${pagina + 1}`} className={CLASSE_LINK_CONTORNO}>
-              Próxima
+              <TextoDoLink>Próxima</TextoDoLink>
             </Link>
           )}
         </nav>

@@ -4,6 +4,7 @@ import { formatarAtualizacao } from "@/application/formatacao";
 import { exigirUsuario } from "@/app/_lib/sessao";
 import { Aviso } from "@/components/aviso";
 import { CLASSE_LINK_CONTORNO, CLASSE_LINK_PRIMARIO } from "@/components/estilos";
+import { TextoDoLink } from "@/components/texto-do-link";
 import { casosDeUso } from "@/infrastructure/container";
 import { CabecalhoPainel } from "./cabecalho-painel";
 import { DialogoExcluirFicha } from "./dialogo-excluir-ficha";
@@ -74,22 +75,22 @@ export default async function PaginaPainel({
               href="/painel/qrcode"
               className="text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              Ampliar e baixar QR Code
+              <TextoDoLink>Ampliar e baixar QR Code</TextoDoLink>
             </Link>
           </section>
 
           <nav aria-label="Ações da ficha" className="flex flex-col gap-[18px]">
             <Link href="/painel/cartao" className={CLASSE_LINK_PRIMARIO}>
-              Ver cartão para impressão
+              <TextoDoLink>Ver cartão para impressão</TextoDoLink>
             </Link>
             <Link href="/painel/ficha/editar" className={CLASSE_LINK_CONTORNO}>
-              Editar ficha clínica
+              <TextoDoLink>Editar ficha clínica</TextoDoLink>
             </Link>
             <Link href="/painel/historico" className={CLASSE_LINK_CONTORNO}>
-              Histórico de acessos
+              <TextoDoLink>Histórico de acessos</TextoDoLink>
             </Link>
             <Link href="/painel/senha-publica" className={CLASSE_LINK_CONTORNO}>
-              Gerar nova senha de acesso
+              <TextoDoLink>Gerar nova senha de acesso</TextoDoLink>
             </Link>
             <DialogoExcluirFicha />
           </nav>
@@ -106,7 +107,7 @@ export default async function PaginaPainel({
             </p>
           </section>
           <Link href="/painel/ficha/nova" className={CLASSE_LINK_PRIMARIO}>
-            Cadastrar ficha clínica
+            <TextoDoLink>Cadastrar ficha clínica</TextoDoLink>
           </Link>
         </>
       )}

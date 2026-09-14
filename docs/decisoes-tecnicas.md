@@ -20,3 +20,10 @@ resolvi as regras abaixo apenas com o que as tabelas existentes já oferecem.
 - **Node 22 no CI:** o Vitest 5, que uso nos testes, exige Node 22 ou superior.
 - **shadcn/ui com Base UI:** o estilo padrão atual do shadcn/ui usa Base UI e o pacote `cn` no lugar do Radix, e mantive o padrão da ferramenta.
 - **Envio de e-mail pelo Resend:** a implementação está pronta, mas não foi testada por falta de chave de API; a demonstração usa a implementação de console, que exibe as mensagens no terminal do servidor.
+
+## Acabamento e deploy
+
+- **Indicador no link em vez de esqueleto de página:** um esqueleto de carregamento no painel fazia a página chegar em partes e deixou a navegação instável no ensaio da demonstração, então mantive o progresso nos botões e passei a mostrar um indicador no próprio link clicado.
+- **Seed que recria a conta de demonstração:** o `npm run seed` apaga e recria a conta fictícia, para que cada gravação parta do mesmo estado.
+- **Funções na região de São Paulo:** o `vercel.json` fixa a região `gru1`, a mesma do banco no Supabase, para reduzir a latência de cada consulta.
+- **Prisma Client gerado no `postinstall`:** a Vercel reaproveita as dependências entre builds, e gerar o client na instalação evita usar uma versão desatualizada.
