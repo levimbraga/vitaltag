@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // O gerador de PDF roda como dependência do Node, sem passar pelo empacotador.
+  serverExternalPackages: ["@react-pdf/renderer"],
+
   async headers() {
     return [
       {

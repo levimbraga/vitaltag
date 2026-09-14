@@ -7,7 +7,7 @@ Registro aqui como verifiquei cada critério de aceite, fase a fase. Uso três m
 - **Navegador:** roteiro automatizado no Chromium contra o build de produção
   (`npm run build && npm start`), em tela de 390px de largura, com dados fictícios que removo
   do banco ao final. Quando o critério depende do que foi gravado, o roteiro também consulta o
-  banco pelo Prisma.
+  banco pelo Prisma; quando depende de arquivo gerado, o roteiro inspeciona o arquivo baixado.
 - **Inspeção:** leitura do código ou da configuração responsável pelo comportamento.
 
 Quando um critério não foi verificado por completo, deixo isso escrito na própria linha.
@@ -84,7 +84,7 @@ Complemento: é possível cadastrar até três contatos, gravados com prioridade
 | --- | --- | --- |
 | O painel indica se a ficha está ativa ou pendente de preenchimento. | Navegador | Antes do cadastro o painel exibiu "Ficha pendente de preenchimento"; depois, "Ficha ativa e publicada". Após a exclusão, voltou a indicar pendente. |
 | O QR Code vigente é exibido junto do link público correspondente. | Navegador e unitário | O painel exibiu o QR Code gerado no servidor e o link `APP_URL/f/<slug>` igual ao `slug_publico` do banco. `qr-code.test.ts` confere que o conteúdo codificado é somente essa URL. |
-| As ações gerar cartão, editar e excluir estão visíveis e acessíveis por teclado. | Navegador | Navegando só com Tab, o foco passou por "Editar ficha clínica", "Gerar nova senha de acesso" e "Excluir ficha". A ação de gerar cartão será verificada na Fase E, junto com o PDF. |
+| As ações gerar cartão, editar e excluir estão visíveis e acessíveis por teclado. | Navegador | Navegando só com Tab, o foco passou por "Ver cartão para impressão", "Editar ficha clínica", "Histórico de acessos", "Gerar nova senha de acesso" e "Excluir ficha" (roteiro da Fase E). |
 | A data e a hora da última atualização da ficha são apresentadas. | Navegador | Ver US04. |
 
 ### US06 — Edição da ficha clínica
@@ -92,7 +92,7 @@ Complemento: é possível cadastrar até três contatos, gravados com prioridade
 | Critério de aceite | Método | Como verifiquei |
 | --- | --- | --- |
 | O formulário de edição abre preenchido com os dados atuais. | Navegador | Nome, tipo sanguíneo, segundo contato e os itens de alergias e cirurgias apareceram preenchidos. A senha pública não é pedida nem exibida. |
-| A alteração é confirmada por mensagem de sucesso e reflete imediatamente na página pública. | Navegador e unitário | Após salvar, o painel exibiu "Ficha atualizada." e o banco registrou o novo tipo sanguíneo e a alergia removida. A página pública continuou respondendo no mesmo endereço; a exibição dos dados atualizados nela será verificada na Fase E, quando o acesso por senha estiver pronto. |
+| A alteração é confirmada por mensagem de sucesso e reflete imediatamente na página pública. | Navegador e unitário | Após salvar, o painel exibiu "Ficha atualizada." e o banco registrou o novo tipo sanguíneo e a alergia removida. No roteiro da Fase E, uma alergia acrescentada na edição apareceu na página pública no acesso seguinte. |
 | A URL pública e o QR Code impresso permanecem os mesmos após a edição. | Unitário e navegador | `ficha.test.ts` preserva o slug público. No navegador, o `slug_publico` no banco e o link do painel continuaram iguais aos anteriores. |
 | O sistema registra a data e a hora da alteração. | Navegador | `atualizada_em` avançou no banco após a edição. |
 
@@ -116,3 +116,67 @@ Complemento: é possível cadastrar até três contatos, gravados com prioridade
 
 Responsividade: painel, formulário da ficha, senha pública e página indisponível não apresentaram
 rolagem horizontal a 320px.
+
+## Fase E — QR Code e acesso público
+
+Roteiro de navegador executado em 14/09/2026: 58 verificações, todas aprovadas na primeira execução.
+
+Para os arquivos gerados, o roteiro usou `pdfinfo` e `pdftotext` (tamanho da página, texto e
+posição das palavras no PDF), `pdftoppm` (rasterização do cartão a 300 dpi) e o decodificador de
+QR Code `jsQR` sobre as imagens.
+
+### US09 — Geração do QR Code
+
+| Critério de aceite | Método | Como verifiquei |
+| --- | --- | --- |
+| O QR Code é gerado a partir de uma URL pública única e não sequencial (UUID). | Unitário e navegador | `qr-code.test.ts` confere que o conteúdo é `APP_URL/f/<slug>`. No navegador, o PNG baixado decodificou para essa URL, com um UUID versão 4 igual ao `slug_publico` do banco. |
+| O código é exibido em tela e pode ser baixado em PNG com no mínimo 512x512 pixels. | Unitário e navegador | `qr-code.test.ts` eleva qualquer tamanho menor a 512 pixels. No navegador, o QR Code aparece no painel e na tela "Seu QR Code", e o PNG baixado tem 1024x1024 pixels. |
+| A leitura do código por qualquer aplicativo padrão de câmera abre a página de senha. | Navegador | Decodifiquei o PNG baixado e o cartão rasterizado; abrir a URL lida retornou a página que pede a senha. Não testei com a câmera de um celular físico: a leitura foi feita por decodificador de software. |
+| O QR Code não contém a senha de acesso público em seu conteúdo. | Unitário e navegador | `qr-code.test.ts` e `cartao.test.ts` conferem que a senha não entra no conteúdo codificado. No navegador, nem o PNG nem o QR Code do cartão continham a senha. |
+
+### US10 — Cartão para impressão
+
+| Critério de aceite | Método | Como verifiquei |
+| --- | --- | --- |
+| O sistema gera um PDF em tamanho crachá contendo o QR Code e o nome do titular. | Navegador | O PDF baixado tem página de 242,6 x 153,1 pt, que corresponde a 85,6 x 54 mm (padrão ID-1), e o texto extraído contém o nome do titular. |
+| A senha de acesso público aparece em campo destacado, fora da área do QR Code. | Navegador e inspeção | A posição extraída do PDF colocou a senha em x = 132,8 pt, à direita do QR Code, que ocupa de 9 a 93 pt. `cartao-pdf.tsx` desenha a senha numa coluna própria, com borda e fundo destacados. |
+| O PDF inclui a instrução de leitura e o aviso de uso exclusivo para emergências. | Navegador | O texto extraído contém "Aponte a câmera do celular para o código e informe a senha", "EMERGÊNCIA MÉDICA" e "Uso exclusivo em situações de emergência médica.". |
+| O arquivo é baixado com o QR Code legível após impressão em 300 dpi. | Navegador | Rasterizei o PDF a 300 dpi (1012x638 pixels) e o QR Code foi decodificado para a URL pública. Não fiz uma impressão física. |
+
+Download logo após definir a senha: na confirmação da senha pública, a tela indica "Este é o
+momento mais simples de gerar o cartão." e o PDF foi baixado sem digitar a senha de novo. Fora desse
+momento, a tela do cartão exigiu a senha: com a senha incorreta não houve download, e com a correta
+o PDF foi baixado. `cartao.test.ts` confirma que nada é gerado com a senha incorreta.
+
+### US11 — Visualização pública da ficha
+
+| Critério de aceite | Método | Como verifiquei |
+| --- | --- | --- |
+| A leitura do QR Code abre a página pública solicitando a senha de acesso. | Navegador | A URL decodificada do QR Code abriu a página com o campo de senha. O HTML inicial, renderizado no servidor, não contém nenhum dado da ficha. |
+| Com a senha correta, a ficha é exibida com tipo sanguíneo e alergias em destaque no topo. | Unitário e navegador | `acesso.test.ts` libera a ficha com tipo sanguíneo e alergias. No navegador, as seções apareceram na ordem tipo sanguíneo, alergias, medicamentos, doenças, cirurgias e contatos, com as alergias em destaque vermelho. O contato tem botão de ligar. |
+| Com a senha incorreta, é exibida mensagem de erro sem revelar qualquer dado da ficha. | Unitário e navegador | `acesso.test.ts` devolve apenas o status de senha incorreta. No navegador, a mensagem "Senha incorreta." apareceu e a página não continha nome, alergias, medicamentos, contato nem tipo sanguíneo. |
+| A página funciona sem login e é legível em tela de celular. | Navegador e inspeção | O acesso foi feito em contexto sem sessão, em tela de 390px, sem rolagem horizontal a 320px na página de senha e na ficha liberada. A ficha é renderizada no servidor e devolvida pela ação de acesso, sem mudar o endereço. |
+
+### US12 — Bloqueio por tentativas
+
+| Critério de aceite | Método | Como verifiquei |
+| --- | --- | --- |
+| Após 5 tentativas incorretas consecutivas o acesso àquela ficha é bloqueado por 15 minutos. | Unitário e navegador | `bloqueio-acesso.test.ts` cobre 4 falhas na janela (liberado), 5 falhas (bloqueado) e 5 falhas com a mais antiga fora da janela (liberado). No navegador, a quinta falha bloqueou; depois de deslocar os registros 15 minutos para trás no banco, o acesso voltou a ser aceito. O tempo real de 15 minutos foi simulado. |
+| A tela informa o bloqueio e o tempo restante, sem expor dados da ficha. | Navegador | A tela exibiu "Acesso bloqueado" com "Tente novamente em 14:54", sem dados da ficha, e continuou bloqueada ao recarregar. |
+| O contador é reiniciado após um acesso bem-sucedido. | Unitário e navegador | `acesso.test.ts` e `bloqueio-acesso.test.ts` desconsideram falhas anteriores ao sucesso. No navegador, 4 falhas, um acesso correto e mais 4 falhas não bloquearam. |
+| O titular é notificado por e-mail quando ocorre um bloqueio. | Unitário e navegador | `acesso.test.ts` avisa o titular uma única vez. No navegador, o bloqueio gerou exatamente um e-mail para o titular no console do servidor. O envio real pelo Resend não foi verificado. |
+
+Complemento: uma página aberta antes do bloqueio enviou a senha correta durante ele; o acesso
+continuou bloqueado e a tentativa não foi gravada no histórico.
+
+### US13 — Histórico de acessos
+
+| Critério de aceite | Método | Como verifiquei |
+| --- | --- | --- |
+| O painel lista data, hora e resultado (sucesso ou falha) de cada tentativa de acesso. | Navegador | A tela listou cada tentativa com data por extenso, hora e a marcação "Sucesso" ou "Senha incorreta", e o total exibido conferiu com o banco. |
+| A lista é ordenada da mais recente para a mais antiga e paginada de 20 em 20 registros. | Unitário e navegador | `acesso.test.ts` lista 20 por página, do mais recente para o mais antigo. No navegador, com 40 registros, a primeira página mostrou 20 em ordem decrescente e a segunda continuou a sequência. |
+| Os registros ficam retidos por 90 dias e são descartados automaticamente após esse prazo. | Unitário e navegador | `acesso.test.ts` descarta registros com mais de 90 dias ao gravar um acesso. No navegador, um registro de 91 dias inserido no banco foi removido no acesso seguinte à ficha. O descarte ocorre na gravação de um novo acesso, e não por agendamento. |
+| Somente o titular autenticado consegue visualizar o histórico. | Unitário e navegador | `acesso.test.ts` não devolve registros a quem não é o titular. No navegador, outro usuário viu o histórico vazio, e o acesso sem sessão foi levado ao login. |
+
+Responsividade: as telas de QR Code, cartão, histórico, página pública de senha, ficha liberada e
+bloqueio não apresentaram rolagem horizontal a 320px.

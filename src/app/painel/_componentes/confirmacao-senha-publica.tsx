@@ -1,7 +1,11 @@
-import { CLASSE_LINK_PRIMARIO } from "@/components/estilos";
+"use client";
+
+import { CLASSE_LINK_CONTORNO } from "@/components/estilos";
+import { BotaoBaixarCartao } from "./baixar-cartao";
 
 // Exibida uma única vez, logo após a definição da senha pública, com o valor que
-// o próprio titular acabou de digitar ou gerar. Depois disso a senha só existe em hash.
+// o próprio titular acabou de digitar ou gerar. Depois disso a senha só existe em hash,
+// por isso este é o único momento em que o cartão sai sem pedir a senha de novo.
 export function ConfirmacaoSenhaPublica({
   titulo,
   descricao,
@@ -32,9 +36,19 @@ export function ConfirmacaoSenhaPublica({
         </p>
       </div>
 
+      <div className="rounded-2xl border border-primary/25 bg-secondary p-4 text-sm leading-relaxed">
+        <p className="font-semibold text-primary">Este é o momento mais simples de gerar o cartão.</p>
+        <p className="mt-1 text-muted-foreground">
+          Enquanto esta tela estiver aberta, o cartão sai com a senha já preenchida. Depois, será
+          preciso digitá-la de novo para imprimir.
+        </p>
+      </div>
+
+      <BotaoBaixarCartao senhaPublica={senha} />
+
       {/* Navegação completa: o cache do roteador pode guardar o painel de antes do
           cadastro, e esta tela não pode revalidá-lo sem se desmontar. */}
-      <a href="/painel" className={CLASSE_LINK_PRIMARIO}>
+      <a href="/painel" className={CLASSE_LINK_CONTORNO}>
         Ir para o painel
       </a>
     </section>

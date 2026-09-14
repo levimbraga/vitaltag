@@ -70,11 +70,23 @@ export default async function PaginaPainel({
             >
               {qrCode.urlPublica.replace(/^https?:\/\//, "")}
             </a>
+            <Link
+              href="/painel/qrcode"
+              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Ampliar e baixar QR Code
+            </Link>
           </section>
 
           <nav aria-label="Ações da ficha" className="flex flex-col gap-[18px]">
+            <Link href="/painel/cartao" className={CLASSE_LINK_PRIMARIO}>
+              Ver cartão para impressão
+            </Link>
             <Link href="/painel/ficha/editar" className={CLASSE_LINK_CONTORNO}>
               Editar ficha clínica
+            </Link>
+            <Link href="/painel/historico" className={CLASSE_LINK_CONTORNO}>
+              Histórico de acessos
             </Link>
             <Link href="/painel/senha-publica" className={CLASSE_LINK_CONTORNO}>
               Gerar nova senha de acesso

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
+import { segundosAte } from "@/app/_lib/requisicao";
 import { casosDeUso } from "@/infrastructure/container";
-import { CabecalhoPublico } from "../_componentes/cabecalho-publico";
+import { FormularioAcessoPublico } from "./formulario-acesso-publico";
 
 export default async function PaginaFichaPublica({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -10,9 +11,9 @@ export default async function PaginaFichaPublica({ params }: { params: Promise<{
   if (situacao.status === "indisponivel") notFound();
 
   return (
-    <CabecalhoPublico
-      titulo="Ficha de emergência"
-      descricao="Informe a senha impressa no cartão junto ao QR Code."
+    <FormularioAcessoPublico
+      slug={slug}
+      segundosBloqueio={situacao.status === "bloqueada" ? segundosAte(situacao.liberaEm) : undefined}
     />
   );
 }

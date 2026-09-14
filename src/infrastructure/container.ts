@@ -10,11 +10,13 @@ import { AtualizarFichaClinica } from "@/application/ficha/atualizar-ficha-clini
 import { CadastrarFichaClinica } from "@/application/ficha/cadastrar-ficha-clinica";
 import { DefinirSenhaPublica } from "@/application/ficha/definir-senha-publica";
 import { ExcluirFichaClinica } from "@/application/ficha/excluir-ficha-clinica";
+import { GerarCartaoPdf } from "@/application/ficha/gerar-cartao-pdf";
 import { GerarQrCodeDaFicha } from "@/application/ficha/gerar-qr-code-da-ficha";
 import { ObterDadosCartao } from "@/application/ficha/obter-dados-cartao";
 import { ObterFichaDoTitular } from "@/application/ficha/obter-ficha-do-titular";
 import { ambiente } from "./config/ambiente";
 import { criarServicoEmail } from "./email/criar-servico-email";
+import { ReactPdfGeradorCartao } from "./pdf/react-pdf-gerador-cartao";
 import { prisma } from "./prisma/cliente";
 import { PrismaAcessoPublicoRepositorio } from "./prisma/repositorios/prisma-acesso-publico-repositorio";
 import { PrismaFichaClinicaRepositorio } from "./prisma/repositorios/prisma-ficha-clinica-repositorio";
@@ -37,6 +39,7 @@ function montar() {
   const email = criarServicoEmail(env);
   const relogio = new RelogioDoSistema();
   const qrCode = new QrCodeGerador();
+  const obterDadosCartao = new ObterDadosCartao(fichas, hash, env.APP_URL);
 
   return {
     urlBase: env.APP_URL,
@@ -59,8 +62,8 @@ function montar() {
     obterFichaDoTitular: new ObterFichaDoTitular(fichas, env.APP_URL),
     excluirFichaClinica: new ExcluirFichaClinica(fichas),
     definirSenhaPublica: new DefinirSenhaPublica(fichas, usuarios, hash),
-    obterDadosCartao: new ObterDadosCartao(fichas, hash, env.APP_URL),
     gerarQrCodeDaFicha: new GerarQrCodeDaFicha(fichas, qrCode, env.APP_URL),
+    gerarCartaoPdf: new GerarCartaoPdf(obterDadosCartao, qrCode, new ReactPdfGeradorCartao()),
 
     consultarSituacaoFichaPublica: new ConsultarSituacaoFichaPublica(fichas, acessos, relogio),
     acessarFichaPublica: new AcessarFichaPublica(fichas, acessos, hash, email, relogio),
