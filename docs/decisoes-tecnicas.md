@@ -27,3 +27,7 @@ resolvi as regras abaixo apenas com o que as tabelas existentes já oferecem.
 - **Seed que recria a conta de demonstração:** o `npm run seed` apaga e recria a conta fictícia, para que cada gravação parta do mesmo estado.
 - **Funções na região de São Paulo:** o `vercel.json` fixa a região `gru1`, a mesma do banco no Supabase, para reduzir a latência de cada consulta.
 - **Prisma Client gerado no `postinstall`:** a Vercel reaproveita as dependências entre builds, e gerar o client na instalação evita usar uma versão desatualizada.
+
+## Ajustes após o primeiro deploy
+
+- **Falha interna no login não aparece como senha errada (US02):** o critério pede mensagem genérica para credenciais incorretas, e eu exibia "E-mail ou senha incorretos." para qualquer erro de autenticação; no primeiro deploy, uma `DATABASE_URL` mal cadastrada na Vercel apareceu como senha incorreta, então restringi a mensagem ao caso em que e-mail e senha não conferem, e as demais falhas abrem a tela de erro e ficam registradas no log. A mensagem continua sem revelar se o e-mail existe.

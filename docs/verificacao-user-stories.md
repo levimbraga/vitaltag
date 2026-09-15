@@ -200,3 +200,20 @@ partes, e o ensaio mostrou telas ainda sem conteúdo logo após a navegação e 
 terminou.
 
 Na primeira versão deste registro a Fase E constava com 58 verificações; o total correto é 56.
+
+## Ajuste após o primeiro deploy
+
+No primeiro deploy, uma `DATABASE_URL` cadastrada com aspas na Vercel fez o login responder
+"E-mail ou senha incorretos." mesmo com a senha correta. Confirmei que o usuário existia no banco,
+que o hash Argon2id conferia e que o login rodava em Node.js; a falha estava na consulta ao banco,
+que o Auth.js convertia em erro de autenticação. Reproduzi o mesmo comportamento localmente com a
+variável entre aspas.
+
+Restringi a mensagem genérica ao caso em que e-mail e senha não conferem. Verificações de
+14/09/2026, contra o build de produção:
+
+| Verificação | Método | Resultado |
+| --- | --- | --- |
+| Credencial que não confere continua gerando a mensagem genérica, e outros erros de autenticação não. | Unitário | `erro-login.test.ts` reconhece `CredentialsSignin` como credencial inválida e recusa `CallbackRouteError` e erros comuns. |
+| Senha errada e e-mail inexistente mostram a mesma mensagem, e a credencial correta entra no painel. | Navegador | Os dois casos exibiram "E-mail ou senha incorretos." e o login correto levou a `/painel`. A regressão da Fase C passou nas 25 verificações. |
+| Falha do banco durante o login abre a tela de erro e fica no log. | Navegador | Com a `DATABASE_URL` entre aspas, o login abriu "Algo deu errado" com "Tentar novamente", sem a mensagem de senha incorreta, e o log do servidor registrou "Falha interna ao autenticar" com o erro de validação da URL do banco. |

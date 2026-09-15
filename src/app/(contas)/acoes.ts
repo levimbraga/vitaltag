@@ -11,17 +11,21 @@ import {
 import { ErroEmailJaCadastrado, ErroTokenInvalido } from "@/domain/erros";
 import { signIn } from "@/infrastructure/auth/auth";
 import { casosDeUso } from "@/infrastructure/container";
+import { credencialNaoConfere } from "@/app/_lib/erro-login";
 import { destinoSeguro, type EstadoFormulario, textoDoFormulario } from "@/app/_lib/formulario";
 
 const MENSAGEM_CREDENCIAIS_INVALIDAS = "E-mail ou senha incorretos.";
 
 // signIn encerra com um redirecionamento, que o Next.js implementa lançando uma
-// exceção própria; só trato os erros de autenticação e deixo o resto seguir.
+// exceção própria; por isso só intercepto a credencial que não confere.
 async function entrarERedirecionar(email: string, senha: string, destino: string) {
   try {
     await signIn("credentials", { email, senha, redirectTo: destino });
   } catch (erro) {
-    if (erro instanceof AuthError) return MENSAGEM_CREDENCIAIS_INVALIDAS;
+    if (credencialNaoConfere(erro)) return MENSAGEM_CREDENCIAIS_INVALIDAS;
+    // Banco fora do ar ou configuração inválida não podem se passar por senha errada:
+    // a falha fica no log e segue para a tela de erro.
+    if (erro instanceof AuthError) console.error("Falha interna ao autenticar", erro);
     throw erro;
   }
 }
