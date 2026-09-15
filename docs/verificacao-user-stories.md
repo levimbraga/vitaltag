@@ -217,3 +217,40 @@ Restringi a mensagem genérica ao caso em que e-mail e senha não conferem. Veri
 | Credencial que não confere continua gerando a mensagem genérica, e outros erros de autenticação não. | Unitário | `erro-login.test.ts` reconhece `CredentialsSignin` como credencial inválida e recusa `CallbackRouteError` e erros comuns. |
 | Senha errada e e-mail inexistente mostram a mesma mensagem, e a credencial correta entra no painel. | Navegador | Os dois casos exibiram "E-mail ou senha incorretos." e o login correto levou a `/painel`. A regressão da Fase C passou nas 25 verificações. |
 | Falha do banco durante o login abre a tela de erro e fica no log. | Navegador | Com a `DATABASE_URL` entre aspas, o login abriu "Algo deu errado" com "Tentar novamente", sem a mensagem de senha incorreta, e o log do servidor registrou "Falha interna ao autenticar" com o erro de validação da URL do banco. |
+
+## Auditoria no site publicado
+
+Em 14/09/2026 rodei um roteiro de navegador contra `https://vitaltag-peach.vercel.app`, e não
+contra o ambiente local. Usei contas fictícias, removidas ao final, e conferi no banco que a conta
+de demonstração continuou igual antes e depois. Foram 106 verificações: 102 aprovadas, 2 com falha
+e 2 não verificáveis.
+
+| User Story | Resultado no site publicado |
+| --- | --- |
+| US01, US02, US04, US05, US06, US07, US08, US09, US11, US13 | Todos os critérios aprovados. |
+| US03 | Critérios aprovados, com os links de redefinição assinados pelo mesmo segredo da aplicação. O recebimento do link por e-mail não foi verificável: com `EMAIL_PROVIDER=console`, a mensagem vai para os logs da Vercel. |
+| US10 | Falhou: o cartão em PDF não era gerado. Corrigido e verificado de novo no site publicado (detalhes abaixo). |
+| US12 | Critérios aprovados, com a passagem dos 15 minutos simulada no banco. O aviso por e-mail ao titular não foi verificável pelo mesmo motivo da US03; a tela de bloqueio informa a notificação. |
+
+### Falha do cartão em PDF e correção
+
+- **Sintoma:** com a senha correta, `POST /painel/cartao/pdf` respondia HTTP 500 com corpo vazio;
+  com a senha errada, respondia 422 normalmente. A tela exibia "Sua sessão expirou. Entre
+  novamente para gerar o cartão.", mensagem que escondia o erro real.
+- **Causa:** reproduzi o empacotamento da Vercel com o build `standalone` do Next.js, que usa o
+  mesmo rastreamento de arquivos, e o servidor registrou
+  `Cannot find module .../node_modules/pdfkit/js/standard-fonts/Helvetica.cjs`. O react-pdf carrega
+  as fontes padrão por subcaminhos do pacote pdfkit que o rastreamento não segue. Localmente
+  funcionava porque o `node_modules` está completo.
+- **Correção:** incluí a pasta das fontes padrão em `outputFileTracingIncludes`, no
+  `next.config.ts`. A rota passou a registrar a falha no log e a responder com mensagem real, e a
+  tela só informa sessão expirada quando a sessão de fato expirou.
+
+| Verificação | Método | Resultado |
+| --- | --- | --- |
+| Com a correção, o build `standalone` gera o PDF. | Navegador | HTTP 200 com `application/pdf`, download pela tela do cartão e nenhum erro no log do servidor. |
+| Uma falha na geração mostra o erro real e fica no log. | Navegador | Em build `standalone` sem as fontes, a rota respondeu HTTP 500 com "Não foi possível gerar o cartão agora. Tente novamente em instantes.", a tela exibiu a mesma mensagem e o log registrou "Falha ao gerar o cartão em PDF" com o erro original. |
+| O PDF baixa no site publicado pela tela do cartão. | Navegador | Com a conta de demonstração, o arquivo `cartao-vitaltag.pdf` foi baixado com 242,6 x 153,1 pt (85,6 x 54 mm), nome do titular, instrução de leitura e aviso de emergência. |
+| O PDF baixa no site publicado pela confirmação da senha, sem redigitá-la. | Navegador | Com uma conta temporária, o cartão foi baixado logo após salvar a ficha, com as mesmas verificações. |
+| A senha fica em campo destacado, fora da área do QR Code. | Navegador | Nos dois PDFs, a senha está em x = 144,3 pt, dentro da caixa "SENHA DE ACESSO", à direita do QR Code, que ocupa de 9 a 93 pt. |
+| O QR Code é legível. | Navegador | Nos dois PDFs, o QR Code rasterizado decodificou para `https://vitaltag-peach.vercel.app/f/<slug>`, sem a senha. No cartão da demonstração, o decodificador não localizou o código na página inteira a 300 dpi, mas leu a página a 150 e a 600 dpi e o recorte do código a 300 dpi. A leitura foi feita por software; câmera e impressão físicas não foram testadas. |
