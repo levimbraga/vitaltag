@@ -14,9 +14,16 @@ export async function baixarCartaoPdf(senhaPublica: string): Promise<string | nu
       body: JSON.stringify({ senhaPublica }),
     });
 
-    if (!resposta.headers.get("content-type")?.includes("application/pdf")) {
-      const corpo = await resposta.json().catch(() => null);
-      return corpo?.erro ?? "Sua sessão expirou. Entre novamente para gerar o cartão.";
+    const tipo = resposta.headers.get("content-type") ?? "";
+    if (!tipo.includes("application/pdf")) {
+      // Só digo que a sessão expirou quando é isso mesmo: resposta 401 ou o
+      // middleware devolvendo a página de login no lugar do PDF.
+      const foiParaLogin = resposta.redirected && new URL(resposta.url).pathname === "/entrar";
+      if (resposta.status === 401 || foiParaLogin) {
+        return "Sua sessão expirou. Entre novamente para gerar o cartão.";
+      }
+      const corpo = tipo.includes("application/json") ? await resposta.json().catch(() => null) : null;
+      return corpo?.erro ?? "Não foi possível gerar o cartão agora. Tente novamente em instantes.";
     }
 
     const url = URL.createObjectURL(await resposta.blob());

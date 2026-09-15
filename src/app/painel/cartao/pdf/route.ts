@@ -30,6 +30,12 @@ export async function POST(requisicao: Request) {
     if (erro instanceof ErroFichaNaoEncontrada) {
       return Response.json({ erro: erro.message }, { status: 404 });
     }
-    throw erro;
+    // Falha na própria geração do PDF: registro o erro real e devolvo uma mensagem
+    // honesta, em vez de uma resposta vazia que o navegador não sabe explicar.
+    console.error("Falha ao gerar o cartão em PDF", erro);
+    return Response.json(
+      { erro: "Não foi possível gerar o cartão agora. Tente novamente em instantes." },
+      { status: 500 },
+    );
   }
 }
